@@ -1,10 +1,26 @@
 .App {
-  text-align: center;
+  background-color: powderblue;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.Column {
+  background-color: lightgray;
+  overflow: auto;
+  height: 100%;
+  margin: 10px;
+  padding: 10px;
+}
+
+.Add-card-btn {
+}
+
+.Card {
+  background-color: white;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 10px 0px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -23,11 +39,6 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
-
-.App-link {
-  color: #61dafb;
-}
-
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
