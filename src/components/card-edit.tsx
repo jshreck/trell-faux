@@ -18,24 +18,29 @@ export const CardEdit = ({ onCancel, onSave }: Props) => {
 
   return (
     <div>
-      <div>
+      <div className="Card">
         <textarea
           type="text"
           id="card-edit"
           name="card-edit"
           placeholder="Enter a title for this card..."
-          rows="3"
+          rows={3}
           value={title}
           onChange={handleChange}
           className="Card"
         />
       </div>
-      <button type="button" disabled={!title} onClick={handleSave}>
-        Add card
-      </button>
-      <button type="button" onClick={onCancel}>
-        X
-      </button>
+      <div className="Edit-card-actions">
+        <button
+          type="button"
+          disabled={!title}
+          onClick={handleSave}
+          className="Save-card-btn"
+        >
+          Add card
+        </button>
+        <div className="Exit-save-btn">X</div>
+      </div>
     </div>
   );
 };

@@ -3,15 +3,28 @@ import { Card as CardType } from "../types/card";
 
 type Props = {
   card: CardType;
+  onDragCard: (card: CardType | null) => void;
+  cardRef: any;
+  isDragging: boolean;
 };
 
-export const Card = ({ card }: Props) => {
-  const onDragStart = (e) => {
-    console.log(`drag start for ${card.title}`);
-    //TODO: store what's being dragged
+export const Card = ({ card, onDragCard, cardRef, isDragging }: Props) => {
+  const onDragStart = (event: DragEvent) => {
+    onDragCard(card);
   };
+
+  const onDragEnd = (event: DragEvent) => {
+    onDragCard(null);
+  };
+
   return (
-    <div className="Card" draggable onDragStart={onDragStart}>
+    <div
+      ref={cardRef}
+      className={`Card ${isDragging ? "Dragging" : null}`}
+      draggable
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+    >
       {card.title}
     </div>
   );

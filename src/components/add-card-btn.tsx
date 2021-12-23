@@ -1,11 +1,11 @@
 import React from "react";
 
-type Props = { onClick: () => void };
+type Props = { onClick: () => void; isDisabled: boolean };
 
-export const AddCardBtn = ({ onClick }: Props) => {
+export const AddCardBtn = ({ onClick, isDisabled }: Props) => {
   return (
-    <button type="button" className="Add-card-btn" onClick={onClick}>
+    <div className="Add-card-btn" onClick={onClick}>
       + Add another card
-    </button>
+    </div>
   );
 };
