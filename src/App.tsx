@@ -8,6 +8,7 @@ import {
   mockQaCards,
   mockDoneCards,
 } from "./testing/mock-cards.ts";
+import Modal from "react-modal";
 
 const title = {
   [CardCategory.ToDo]: "To Do",
@@ -20,13 +21,28 @@ const App = () => {
   const [cards, setCards] = React.useState<{
     [key: CardCategory]: Card[];
   }>({
-    [CardCategory.ToDo]: mockToDoCards,
-    [CardCategory.InProgress]: mockInProgressCards,
-    [CardCategory.QA]: mockQaCards,
-    [CardCategory.Done]: mockDoneCards,
+    [CardCategory.ToDo]: [],
+    [CardCategory.InProgress]: [],
+    [CardCategory.QA]: [],
+    [CardCategory.Done]: [],
   });
   const [draggingCard, setDraggingCard] = React.useState<Card | null>(null);
   const [lastIdUsed = 20, setLastIdUsed] = React.useState<number>(20);
+  const [modalIsOpen, setModalIsOpen] = React.useState<boolean>(true);
+
+  const useSampleData = () => {
+    setCards({
+      [CardCategory.ToDo]: mockToDoCards,
+      [CardCategory.InProgress]: mockInProgressCards,
+      [CardCategory.QA]: mockQaCards,
+      [CardCategory.Done]: mockDoneCards,
+    });
+    closeModal();
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
 
   const onAddNewCard = (card: Partial<Card>) => {
     const id = lastIdUsed + 1;
@@ -83,6 +99,24 @@ const App = () => {
           />
         ))}
       </div>
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={() => setModalIsOpen(false)}
+        style={{
+          content: {
+            textAlign: "center",
+            width: "fit-content",
+            height: "fit-content",
+          },
+        }}
+        contentLabel="Example Modal"
+      >
+        <h2>Would you like to use sample data?</h2>
+        <button onClick={useSampleData}>yes</button>
+        <button onClick={closeModal} style={{ marginLeft: "10px" }}>
+          no
+        </button>
+      </Modal>
     </div>
   );
 };
