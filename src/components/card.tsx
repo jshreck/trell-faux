@@ -13,17 +13,12 @@ export const Card = ({ card, onDragCard, cardRef, isDragging }: Props) => {
     onDragCard(card);
   };
 
-  const onDragEnd = (event: DragEvent) => {
-    onDragCard(null);
-  };
-
   return (
     <div
       ref={cardRef}
       className={`Card ${isDragging ? "Dragging" : null}`}
       draggable
       onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
     >
       {card.title}
     </div>

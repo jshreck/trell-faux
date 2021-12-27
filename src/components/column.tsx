@@ -75,12 +75,12 @@ export const Column = ({
     return cardAfter;
   };
 
-  //   const onDrop = (event: DragEvent) => {
-  //     onMoveCardTo(category);
-  //   };
+  const onDrop = (event: DragEvent) => {
+    onDragCard(null);
+  };
 
   return (
-    <div className="Column" onDragOver={onDragOver}>
+    <div className="Column" onDragOver={onDragOver} onDrop={onDrop}>
       <p>
         <b>{title}</b>
       </p>

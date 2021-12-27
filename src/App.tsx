@@ -60,6 +60,7 @@ const App = () => {
     }
 
     const newCard = { ...draggingCard, category: toCategory };
+    setDraggingCard(newCard);
 
     switch (toCategory) {
       case CardCategory.ToDo:
