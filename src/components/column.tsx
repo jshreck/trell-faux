@@ -9,7 +9,7 @@ type Props = {
   category: CardCategory;
   cards: Card[];
   onAddNewCard: (card: Partial<CardType>) => void;
-  onDragCard: (card: CardType) => void;
+  onDragCard: (card: CardType | null) => void;
   onMoveCardTo: (toCategory: CardCategory, cardAfter?: Card) => void;
   draggingCard: Card;
 };
@@ -75,12 +75,12 @@ export const Column = ({
     return cardAfter;
   };
 
-  //   const onDrop = (event: DragEvent) => {
-  //     onMoveCardTo(category);
-  //   };
+  const onDrop = (event: DragEvent) => {
+    onDragCard(null);
+  };
 
   return (
-    <div className="Column" onDragOver={onDragOver}>
+    <div className="Column" onDragOver={onDragOver} onDrop={onDrop}>
       <p>
         <b>{title}</b>
       </p>
