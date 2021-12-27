@@ -8,46 +8,49 @@ import {
   mockQaCards,
   mockDoneCards,
 } from "./testing/mock-cards.ts";
+import Modal from "react-modal";
+
+const title = {
+  [CardCategory.ToDo]: "To Do",
+  [CardCategory.InProgress]: "In Progress",
+  [CardCategory.QA]: "QA",
+  [CardCategory.Done]: "Done",
+};
 
 const App = () => {
-  const [toDoCards, setToDoCards] = React.useState<Card[]>(mockToDoCards);
-  const [inProgressCards, setInProgressCards] =
-    React.useState<Card[]>(mockInProgressCards);
-  const [qaCards, setQaCards] = React.useState<Card[]>(mockQaCards);
-  const [doneCards, setDoneCards] = React.useState<Card[]>(mockDoneCards);
+  const [cards, setCards] = React.useState<{
+    [key: CardCategory]: Card[];
+  }>({
+    [CardCategory.ToDo]: [],
+    [CardCategory.InProgress]: [],
+    [CardCategory.QA]: [],
+    [CardCategory.Done]: [],
+  });
   const [draggingCard, setDraggingCard] = React.useState<Card | null>(null);
   const [lastIdUsed = 20, setLastIdUsed] = React.useState<number>(20);
-  const categories = [
-    {
-      title: "To Do",
-      category: CardCategory.ToDo,
-      cards: toDoCards,
-    },
-    {
-      title: "In Progress",
-      category: CardCategory.InProgress,
-      cards: inProgressCards,
-    },
-    { title: "QA", category: CardCategory.QA, cards: qaCards },
-    { title: "Done", category: CardCategory.Done, cards: doneCards },
-  ];
+  const [modalIsOpen, setModalIsOpen] = React.useState<boolean>(true);
+
+  const useSampleData = () => {
+    setCards({
+      [CardCategory.ToDo]: mockToDoCards,
+      [CardCategory.InProgress]: mockInProgressCards,
+      [CardCategory.QA]: mockQaCards,
+      [CardCategory.Done]: mockDoneCards,
+    });
+    closeModal();
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
 
   const onAddNewCard = (card: Partial<Card>) => {
     const id = lastIdUsed + 1;
     setLastIdUsed(id);
-    switch (card.category) {
-      case CardCategory.ToDo:
-        setToDoCards([...toDoCards, { ...card, id }]);
-        break;
-      case CardCategory.InProgress:
-        setInProgressCards([...inProgressCards, { ...card, id }]);
-        break;
-      case CardCategory.QA:
-        setQaCards([...qaCards, { ...card, id }]);
-        break;
-      case CardCategory.Done:
-        setDoneCards([...doneCards, { ...card, id }]);
-    }
+    const cardCategory = card.category;
+    const newCol = [...cards[cardCategory], { ...card, id }];
+
+    setCards({ ...cards, [cardCategory]: newCol });
   };
 
   const onDragCard = (card: Card) => {
@@ -55,101 +58,40 @@ const App = () => {
   };
 
   const onMoveCardTo = (toCategory: CardCategory, cardAfter?: Card) => {
+    const removeFrom = {};
     if (toCategory !== draggingCard.category) {
-      removeFromCategory(draggingCard);
+      removeFrom[draggingCard.category] = cards[draggingCard.category].filter(
+        (c: Card) => c.id !== draggingCard.id
+      );
     }
 
     const newCard = { ...draggingCard, category: toCategory };
+    setDraggingCard(newCard);
 
-    switch (toCategory) {
-      case CardCategory.ToDo:
-        {
-          const filtered = toDoCards.filter((card) => card.id !== newCard.id);
-          const cardAfterIndex = filtered.findIndex(
-            (card) => card.id === cardAfter?.id
-          );
+    const newCol = [...cards[toCategory]].filter(
+      (card) => card.id !== newCard.id
+    );
+    const cardAfterIndex = newCol.findIndex(
+      (card) => card.id === cardAfter?.id
+    );
+    newCol.splice(
+      cardAfterIndex > -1 ? cardAfterIndex : newCol.length,
+      0,
+      newCard
+    );
 
-          filtered.splice(
-            cardAfterIndex > -1 ? cardAfterIndex : filtered.length,
-            0,
-            newCard
-          );
-          setToDoCards(filtered);
-        }
-        break;
-      case CardCategory.InProgress:
-        {
-          const filtered = inProgressCards.filter(
-            (card) => card.id !== newCard.id
-          );
-          const cardAfterIndex = filtered.findIndex(
-            (card) => card.id === cardAfter?.id
-          );
-
-          filtered.splice(
-            cardAfterIndex > -1 ? cardAfterIndex : filtered.length,
-            0,
-            newCard
-          );
-          setInProgressCards(filtered);
-        }
-        break;
-      case CardCategory.QA:
-        {
-          const filtered = qaCards.filter((card) => card.id !== newCard.id);
-          const cardAfterIndex = filtered.findIndex(
-            (card) => card.id === cardAfter?.id
-          );
-
-          filtered.splice(
-            cardAfterIndex > -1 ? cardAfterIndex : filtered.length,
-            0,
-            newCard
-          );
-          setQaCards(filtered);
-        }
-        break;
-      case CardCategory.Done: {
-        const filtered = doneCards.filter((card) => card.id !== newCard.id);
-        const cardAfterIndex = filtered.findIndex(
-          (card) => card.id === cardAfter?.id
-        );
-
-        filtered.splice(
-          cardAfterIndex > -1 ? cardAfterIndex : filtered.length,
-          0,
-          newCard
-        );
-        setDoneCards(filtered);
-      }
-    }
-  };
-
-  const removeFromCategory = (card: Card) => {
-    const filterCondition = (c: Card) => c.id !== card.id;
-    switch (card.category) {
-      case CardCategory.ToDo:
-        setToDoCards(toDoCards.filter(filterCondition));
-        break;
-      case CardCategory.InProgress:
-        setInProgressCards(inProgressCards.filter(filterCondition));
-        break;
-      case CardCategory.QA:
-        setQaCards(qaCards.filter(filterCondition));
-        break;
-      case CardCategory.Done:
-        setDoneCards(doneCards.filter(filterCondition));
-    }
+    setCards({ ...cards, [toCategory]: newCol, ...removeFrom });
   };
 
   return (
     <div className="App">
-      {" "}
       <div className="Container">
-        {categories.map((category) => (
+        {Object.keys(cards).map((key) => (
           <Column
-            key={category.category}
-            {...category}
+            key={key}
+            title={title[key]}
+            category={key}
+            cards={cards[key]}
             onAddNewCard={onAddNewCard}
             onMoveCardTo={onMoveCardTo}
             onDragCard={onDragCard}
@@ -157,6 +99,24 @@ const App = () => {
           />
         ))}
       </div>
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={() => setModalIsOpen(false)}
+        style={{
+          content: {
+            textAlign: "center",
+            width: "fit-content",
+            height: "fit-content",
+          },
+        }}
+        contentLabel="Example Modal"
+      >
+        <h2>Would you like to use sample data?</h2>
+        <button onClick={useSampleData}>yes</button>
+        <button onClick={closeModal} style={{ marginLeft: "10px" }}>
+          no
+        </button>
+      </Modal>
     </div>
   );
 };
